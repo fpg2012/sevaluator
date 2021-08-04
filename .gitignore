@@ -1,0 +1,6 @@
+libsevaluator.so
+calc.tab.c
+lex.yy.c
+calc.tab.h
+calc.output
+test
