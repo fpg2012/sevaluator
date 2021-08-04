@@ -4,3 +4,4 @@ lex.yy.c
 calc.tab.h
 calc.output
 test
+.vscode

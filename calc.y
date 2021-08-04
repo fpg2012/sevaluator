@@ -44,19 +44,19 @@ static gmp_randstate_t random_state;
 /* %parse-param { ResultType *result_type } { Result *result } */
 
 %%
-calc: expr { mpq_set(full_result.result.v_rat, $1); full_result.result_type = R_RAT; }
-expr: expr PLUS fact { mpq_add($$, $1, $3); }
-    | expr MINUS fact { mpq_sub($$, $1, $3); }
-    | fact { mpq_set($$, $1); }
+calc: expr { mpq_init(full_result.result.v_rat); mpq_set(full_result.result.v_rat, $1); full_result.result_type = R_RAT; }
+expr: expr PLUS fact { mpq_init($$); mpq_add($$, $1, $3); }
+    | expr MINUS fact { mpq_init($$); mpq_sub($$, $1, $3); }
+    | fact { mpq_init($$); mpq_set($$, $1); }
     ;
-fact: fact MULTIPLY number { mpq_mul($$, $1, $3); }
-    | fact DIVIDE number { mpq_div($$, $1, $3); }
-    | number { mpq_set($$, $1); }
-    | MINUS fact { mpq_neg($$, $2); }
-    | PLUS fact { mpq_set($$, $2); }
+fact: fact MULTIPLY number { mpq_init($$); mpq_mul($$, $1, $3); }
+    | fact DIVIDE number { mpq_init($$); mpq_div($$, $1, $3); }
+    | number { mpq_init($$); mpq_set($$, $1); }
+    | MINUS fact { mpq_init($$); mpq_neg($$, $2); }
+    | PLUS fact { mpq_init($$); mpq_set($$, $2); }
     ;
-number: literal { mpq_set($$, $1); }
-    | LEFT expr RIGHT { mpq_set($$, $2); }
+number: literal { mpq_init($$); mpq_set($$, $1); }
+    | LEFT expr RIGHT { mpq_init($$); mpq_set($$, $2); }
     ;
 literal: 
     FUNC_HIST F_LEFT INTEGER F_RIGHT { 
@@ -80,8 +80,8 @@ literal:
         mpq_init($$);
         mpq_set_ui($$, temp, 1);
     }
-    | RATIONAL { mpq_set($$, $1); }
-    | INTEGER { mpq_set_z($$, $1); }
+    | RATIONAL { mpq_init($$); mpq_set($$, $1); }
+    | INTEGER { mpq_init($$); mpq_set_z($$, $1); }
     ;
 
 %%
