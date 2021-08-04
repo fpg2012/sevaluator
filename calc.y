@@ -3,27 +3,18 @@
 #include <stdlib.h>
 #include <gmp.h>
 #include <string.h>
+#include <sys/random.h>
 #include "sevaluator.h"
 
 extern int yylex();
 extern int yyparse();
 
-typedef union result {
-    mpz_t v_int;
-    mpq_t v_rat;
-    mpf_t v_flt;
-} Result;
-
-typedef enum result_type {
-    R_INT,
-    R_RAT,
-    R_FLT,
-} ResultType;
-
 void yyerror(const char *s);
 
-static ResultType result_type;
-static Result result;
+static FullResult full_result;
+static Mode mode;
+static HistoryList *history_list;
+static gmp_randstate_t random_state;
 
 %}
 
@@ -53,7 +44,7 @@ static Result result;
 /* %parse-param { ResultType *result_type } { Result *result } */
 
 %%
-calc: expr { mpq_set(result.v_rat, $1); result_type = R_RAT; }
+calc: expr { mpq_set(full_result.result.v_rat, $1); full_result.result_type = R_RAT; }
 expr: expr PLUS fact { mpq_add($$, $1, $3); }
     | expr MINUS fact { mpq_sub($$, $1, $3); }
     | fact { mpq_set($$, $1); }
@@ -67,7 +58,30 @@ fact: fact MULTIPLY number { mpq_mul($$, $1, $3); }
 number: literal { mpq_set($$, $1); }
     | LEFT expr RIGHT { mpq_set($$, $2); }
     ;
-literal: RATIONAL { mpq_set($$, $1); }
+literal: 
+    FUNC_HIST F_LEFT INTEGER F_RIGHT { 
+        if (mode == NO_HISTORY) { YYABORT; } 
+        if (mpz_cmp_ui($3, 1000000) > 0) {
+            YYABORT;
+        }
+        int index = (int) mpz_get_ui($3);
+        const char *hist_result = sevaluator_history_get(history_list, index);
+        
+        if (!hist_result) {
+            YYABORT;
+        }
+        mpq_init($$);
+        mpq_set_str($$, hist_result, 10);
+    }
+    | FUNC_RANDOM F_LEFT F_RIGHT {
+
+        unsigned long temp = gmp_urandomb_ui(random_state, 8);
+
+        mpq_init($$);
+        mpq_set_ui($$, temp, 1);
+    }
+    | RATIONAL { mpq_set($$, $1); }
+    | INTEGER { mpq_set_z($$, $1); }
     ;
 
 %%
@@ -79,19 +93,62 @@ literal: RATIONAL { mpq_set($$, $1); }
     return 0;
 } */
 
-int calc(const char *input, char **output) {
+void init_random_state() {
+    gmp_randinit_default(random_state);
+    unsigned long seed;
+    getrandom(&seed, sizeof(seed), GRND_RANDOM);
+    gmp_randseed_ui(random_state, seed);
+}
+
+int sevaluator_calc_no_history(const char *input, char **output) {
+    init_random_state();
+    mode = NO_HISTORY;
     yy_scan_string(input);
     int error = yyparse();
     if (error) {
+        yylex_destroy();
+        gmp_randclear(random_state);
         return 1;
     }
-    if (result_type == R_RAT) {
-        *output = mpq_get_str(NULL, 10, result.v_rat);
-        mpq_clear(result.v_rat);
-        return 0;
+    if (full_result.result_type == R_RAT) {
+        *output = mpq_get_str(NULL, 10, full_result.result.v_rat);
+        mpq_clear(full_result.result.v_rat);
+    } else {
+        yylex_destroy();
+        gmp_randclear(random_state);
+        return 1;
     }
     yylex_destroy();
-    return 1;
+    gmp_randclear(random_state);
+    return 0;
+}
+
+int sevaluator_calc(const char *input, char **output, HistoryList *list) {
+    init_random_state();
+    mode = DEFAULT;
+    history_list = list;
+    yy_scan_string(input);
+    int error = yyparse();
+    if (error) {
+        history_list = NULL;
+        yylex_destroy();
+        gmp_randclear(random_state);
+        return 1;
+    }
+    if (full_result.result_type == R_RAT) {
+        *output = mpq_get_str(NULL, 10, full_result.result.v_rat);
+        mpq_clear(full_result.result.v_rat);
+        sevaluator_history_push(history_list, *output);
+    } else {
+        history_list = NULL;
+        yylex_destroy();
+        gmp_randclear(random_state);
+        return 1;
+    }
+    history_list = NULL;
+    yylex_destroy();
+    gmp_randclear(random_state);
+    return 0;
 }
 
 void yyerror(const char *s) {

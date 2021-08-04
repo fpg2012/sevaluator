@@ -21,7 +21,7 @@ void from_decimal(mpq_t, const char *);
     }
 [0-9]+ { 
     from_decimal(yylval.v_rational, yytext);  
-    return RATIONAL;
+    return INTEGER;
     }
 "+" { return PLUS; }
 "-" { return MINUS; }
