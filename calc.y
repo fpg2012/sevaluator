@@ -66,12 +66,12 @@ literal:
         }
         int index = (int) mpz_get_ui($3);
         const char *hist_result = sevaluator_history_get(history_list, index);
-        
         if (!hist_result) {
             YYABORT;
         }
         mpq_init($$);
         mpq_set_str($$, hist_result, 10);
+        free(hist_result);
     }
     | FUNC_RANDOM F_LEFT F_RIGHT {
 
