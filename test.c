@@ -2,48 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main() {
+int test(const char *expr, HistoryList *list) {
     char *output;
-    char *output2;
-    HistoryList *hist_list = sevaluator_history_create();
-    int error = sevaluator_calc("-12+3*5", &output, hist_list);
+    int error = sevaluator_calc(expr, &output, list);
     if (error) {
         printf("error\n");
         return 1;
     }
     printf("%s\n", output);
-    error = sevaluator_calc("1 *100 - 10", &output2, hist_list);
-    if (error) {
-        printf("error\n");
-        return 1;
-    }
-    printf("%s\n", output2);
-    error = sevaluator_calc("hist[0]", &output2, hist_list);
-    if (error) {
-        printf("error\n");
-        return 1;
-    }
-    printf("%s\n", output2);
-    error = sevaluator_calc("hist[1] + hist[0]", &output2, hist_list);
-    if (error) {
-        printf("error\n");
-        return 1;
-    }
-    printf("%s\n", output2);
-    error = sevaluator_calc("random[]", &output2, hist_list);
-    if (error) {
-        printf("error\n");
-        return 1;
-    }
-    printf("%s\n", output2);
-    error = sevaluator_calc("hist[100]", &output2, hist_list);
-    if (error) {
-        printf("error\n");
-        return 1;
-    }
-    printf("%s\n", output2);
     free(output);
-    free(output2);
+}
+
+int main() {
+    HistoryList *hist_list = sevaluator_history_create();
+
+    test("1 *100 - 10", hist_list);
+    test("hist[0]", hist_list);
+    test("hist[1] + hist[0]", hist_list);
+    test("random[]", hist_list);
+    test("hist[100]", hist_list);
+    test("hist[3]", hist_list);
+
     sevaluator_history_destory(hist_list);
     return 0;
 }

@@ -11,7 +11,7 @@ extern int yyparse();
 
 void yyerror(const char *s);
 
-static FullResult full_result;
+static FullResult final_result;
 static Mode mode;
 static HistoryList *history_list;
 static gmp_randstate_t random_state;
@@ -26,7 +26,7 @@ static gmp_randstate_t random_state;
 
 %token<v_integer> INTEGER;
 %token<v_rational> RATIONAL;
-%token PLUS MINUS MULTIPLY DIVIDE POWER MOD SQRT LEFT RIGHT F_LEFT F_RIGHT COMMA FUNC_HIST FUNC_RANDOM FACTORIAL
+%token PLUS MINUS MULTIPLY DIVIDE POWER MOD SQRT LEFT RIGHT F_LEFT F_RIGHT COMMA FUNC_HIST FUNC_RANDOM FACTORIAL ANS
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MOD
 
@@ -45,9 +45,9 @@ static gmp_randstate_t random_state;
 
 %%
 calc: expr { 
-        mpq_init(full_result.result.v_rat); 
-        mpq_set(full_result.result.v_rat, $1); 
-        full_result.result_type = R_RAT; 
+        mpq_init(final_result.result.v_rat); 
+        mpq_set(final_result.result.v_rat, $1); 
+        final_result.result_type = R_RAT; 
         mpq_clear($1); 
     }
 expr: expr PLUS fact { mpq_init($$); mpq_add($$, $1, $3); mpq_clear($1); mpq_clear($3); }
@@ -64,7 +64,16 @@ number: literal { mpq_init($$); mpq_set($$, $1); }
     | LEFT expr RIGHT { mpq_init($$); mpq_set($$, $2); mpq_clear($2); }
     ;
 literal: 
-    FUNC_HIST F_LEFT INTEGER F_RIGHT { 
+    | ANS {
+        if (mode == NO_HISTORY) { YYABORT; }
+        const char *hist_result = sevaluator_history_get(history_list, history_list->len-1);
+        if (!hist_result) {
+            YYABORT;
+        }
+        mpq_init($$);
+        mpq_set_str($$, hist_result, 10);
+    }
+    | FUNC_HIST F_LEFT INTEGER F_RIGHT { 
         if (mode == NO_HISTORY) { YYABORT; } 
         if (mpz_cmp_ui($3, 1000000) > 0) {
             mpz_clear($3);
@@ -78,7 +87,6 @@ literal:
         }
         mpq_init($$);
         mpq_set_str($$, hist_result, 10);
-        free(hist_result);
         mpz_clear($3);
     }
     | FUNC_RANDOM F_LEFT F_RIGHT {
@@ -116,9 +124,9 @@ int sevaluator_calc_no_history(const char *input, char **output) {
         gmp_randclear(random_state);
         return 1;
     }
-    if (full_result.result_type == R_RAT) {
-        *output = mpq_get_str(NULL, 10, full_result.result.v_rat);
-        mpq_clear(full_result.result.v_rat);
+    if (final_result.result_type == R_RAT) {
+        *output = mpq_get_str(NULL, 10, final_result.result.v_rat);
+        mpq_clear(final_result.result.v_rat);
     } else {
         yylex_destroy();
         gmp_randclear(random_state);
@@ -141,9 +149,9 @@ int sevaluator_calc(const char *input, char **output, HistoryList *list) {
         gmp_randclear(random_state);
         return 1;
     }
-    if (full_result.result_type == R_RAT) {
-        *output = mpq_get_str(NULL, 10, full_result.result.v_rat);
-        mpq_clear(full_result.result.v_rat);
+    if (final_result.result_type == R_RAT) {
+        *output = mpq_get_str(NULL, 10, final_result.result.v_rat);
+        mpq_clear(final_result.result.v_rat);
         sevaluator_history_push(history_list, *output);
     } else {
         history_list = NULL;

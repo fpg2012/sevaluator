@@ -40,10 +40,7 @@ const char *sevaluator_history_get(HistoryList *list, int k) {
     for (int i = list->len-1; i > k; --i) {
         current_node = current_node->next_node;
     }
-    int len = strlen(current_node->next_node->p);
-    char *ret = (char*) malloc(len + 1);
-    strcpy(ret, current_node->next_node->p);
-    return ret;
+    return current_node->next_node->p;
 }
 
 int sevaluator_history_get_length(HistoryList *list) {
