@@ -36,6 +36,12 @@ int main() {
         return 1;
     }
     printf("%s\n", output2);
+    error = sevaluator_calc("hist[100]", &output2, hist_list);
+    if (error) {
+        printf("error\n");
+        return 1;
+    }
+    printf("%s\n", output2);
     free(output);
     free(output2);
     sevaluator_history_destory(hist_list);
