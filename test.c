@@ -47,6 +47,9 @@ int main() {
     test("10 / 0", hist_list);
     test("-√(2-16)", hist_list);
 
+    test("(ans) * 2", hist_list);
+    test("hist[7]", hist_list);
+
     sevaluator_history_destory(hist_list);
 
     test_result();
