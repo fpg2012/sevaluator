@@ -13,6 +13,15 @@ int test(const char *expr, HistoryList *list) {
     free(output);
 }
 
+void test_result() {
+    FullResult a, b, c;
+    sevaluator_result_init_str(&a, R_FLT, "-0.1");
+    sevaluator_result_init_str(&b, R_FLT, "0.2");
+    sevaluator_result_mul(&c, &a, &b);
+    char *temp = sevaluator_result_get_str(&c, 10);
+    printf("%s\n", temp);
+}
+
 int main() {
     HistoryList *hist_list = sevaluator_history_create();
 
@@ -24,5 +33,7 @@ int main() {
     test("hist[3]", hist_list);
 
     sevaluator_history_destory(hist_list);
+
+    test_result();
     return 0;
 }

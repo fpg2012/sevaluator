@@ -1,4 +1,5 @@
 #include "sevaluator_result.h"
+#include <string.h>
 
 /*
     Z Q R (op1)
@@ -8,7 +9,7 @@
 (op2)
 */
 static ResultType _add_result_type(ResultType op1, ResultType op2) {
-    if (op1 == R_INT && op2 == R_RAT) {
+    if (op1 == R_INT && op2 == R_INT) {
         return R_INT;
     }
     else if (op1 == R_RAT || op2 == R_RAT && (op1 != R_FLT && op2 != R_FLT)) {
@@ -50,7 +51,23 @@ void sevaluator_result_init(FullResult *result, ResultType type) {
     else if (type == R_RAT) {
         mpq_init(result->result.v_rat);
     }
-    mpf_init(result->result.v_flt);
+    else {
+        mpf_init(result->result.v_flt);
+    }
+}
+
+void sevaluator_result_init_str(FullResult *result, ResultType type, const char *str) {
+    sevaluator_result_init(result, type);
+    switch (type) {
+        case R_INT:
+            mpz_set_str(result->result.v_int, str, 10);
+            break;
+        case R_RAT:
+            mpq_set_str(result->result.v_rat, str, 10);
+            break;
+        default:
+            mpf_set_str(result->result.v_flt, str, 10);
+    }
 }
 
 // attention! this function does NOT free memory for `result`
@@ -199,4 +216,58 @@ void sevaluator_result_mod(FullResult *result, FullResult *op1, FullResult *op2)
 void sevaluator_result_sqrt(FullResult *result, FullResult *op1) {
     sevaluator_result_upgrade(op1, R_FLT);
     mpf_sqrt(result->result.v_flt, op1->result.v_flt);
+}
+
+char *sevaluator_result_get_str(FullResult *result, size_t digits) {
+    char *temp;
+    if (result->result_type == R_INT) {
+        temp = mpz_get_str(NULL, 10, result->result.v_int);
+        return temp;
+    } else if (result->result_type == R_RAT) {
+        temp = mpq_get_str(NULL, 10, result->result.v_rat);
+        return temp;
+    } else {
+        mp_exp_t exp;
+        temp = mpf_get_str(NULL, &exp, 10, digits, result->result.v_flt);
+        char *temp2 = (char*) malloc(strlen(temp) + digits + 10);
+
+        long int_part = exp;
+        char *p = temp, *q = temp2;
+
+        if (*p == '-') {
+            *q = '-';
+            p++; q++;
+        }
+
+        size_t len = strlen(p);
+
+        if (int_part > 0 && len > int_part) {
+            memcpy(q, p, int_part);
+            strcat(q, ".");
+            strcat(q, p + int_part);
+        }
+        else if (int_part == 0 && len > 0) {
+            strcpy(q, "0.");
+            strcat(q, p);
+        } else if (int_part > 0 && len <= int_part) {
+            strcpy(q, p);
+            long zeros_n = int_part - len;
+            for (long i = 0; i < zeros_n; i++) {
+                strcat(q, "0");
+            }
+        }
+        else if (int_part < 0) {
+            strcpy(q, "0.");
+            for (long i = 0; i > int_part; --i) {
+                strcat(q, "0");
+            }
+            strcat(q, p);
+        }
+        else {
+            strcpy(temp2, "error");
+        }
+        free(temp);
+        return temp2;
+    }
+    return NULL;
 }

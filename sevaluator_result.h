@@ -24,11 +24,20 @@ typedef struct full_result {
 // attention! this function does NOT call malloc for `result`
 void sevaluator_result_init(FullResult *result, ResultType type);
 
+// attention! this function does NOT call malloc for `result`
+// does not check str
+void sevaluator_result_init_str(FullResult *result, ResultType type, const char *str);
+
 // attention! this function does NOT free memory for `result`
 void sevaluator_result_destroy(FullResult *result);
 
 // do nothing if UNABLE to upgrade
 void sevaluator_result_upgrade(FullResult *result, ResultType to_upgrade);
+
+
+/*
+    Should not init `result` outside of the following functions.
+*/
 
 void sevaluator_result_add(FullResult *result, FullResult *op1, FullResult *op2);
 
@@ -45,4 +54,6 @@ void sevaluator_result_mod(FullResult *result, FullResult *op1, FullResult *op2)
 // this function does NOT check whether `op1` is negative
 void sevaluator_result_sqrt(FullResult *result, FullResult *op1);
 
-#endif SEVALUATOR_RESULT
+char *sevaluator_result_get_str(FullResult *result, size_t digits);
+
+#endif
