@@ -8,7 +8,7 @@ usage example (see test.c):
 
 ```c
 #include "sevaluator.h"
-#inculde <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 int main() {
