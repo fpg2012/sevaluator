@@ -43,17 +43,29 @@ const char *sevaluator_history_get(HistoryList *list, int k) {
     return current_node->next_node->p;
 }
 
+ResultType sevaluator_history_get_type(HistoryList *list, int k) {
+    if (k >= list->len) {
+        return R_UNK;
+    }
+    HistortyNode *current_node = list->first_node;
+    for (int i = list->len-1; i > k; --i) {
+        current_node = current_node->next_node;
+    }
+    return current_node->next_node->type;
+}
+
 int sevaluator_history_get_length(HistoryList *list) {
     return list->len;
 }
 
-void sevaluator_history_push(HistoryList *list, const char *p) {
+void sevaluator_history_push(HistoryList *list, const char *p, ResultType type) {
     HistortyNode *node = (HistortyNode*) malloc(sizeof(HistortyNode));
 
     char *str = (char*) malloc(strlen(p) + 1);
     strcpy(str, p);
 
     node->p = str;
+    node->type = type;
     node->next_node = list->first_node->next_node;
 
     list->first_node->next_node = node;

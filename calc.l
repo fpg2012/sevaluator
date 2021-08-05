@@ -6,10 +6,10 @@
 #include <string.h>
 #include <stdbool.h>
 #define YY_DECL int yylex()
+#include "sevaluator_result.h"
 #include "calc.tab.h"
 
 void from_decimal(mpq_t, const char *);
-
 %}
 
 %%
@@ -19,8 +19,9 @@ void from_decimal(mpq_t, const char *);
     from_decimal(yylval.v_rational, yytext); 
     return RATIONAL; 
     }
-[0-9]+ { 
-    from_decimal(yylval.v_rational, yytext);  
+[0-9]+ {
+    mpz_init(yylval.v_integer);
+    mpz_set_str(yylval.v_integer, yytext, 10);
     return INTEGER;
     }
 "+" { return PLUS; }

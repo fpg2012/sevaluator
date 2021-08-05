@@ -9,7 +9,14 @@ typedef enum mode {
     NO_HISTORY,
 } Mode;
 
-int sevaluator_calc_no_history(const char *input, char **output);
-int sevaluator_calc(const char *input, char **output, HistoryList *list);
+typedef enum error_type {
+    E_OK,
+    E_SYNTAX,
+    E_DIV_ZERO,
+    E_NEGTIVE_ROOT,
+    E_NO_HISTORY,
+} ErrorType;
+
+ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits);
 
 #endif

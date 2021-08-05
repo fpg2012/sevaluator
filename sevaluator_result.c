@@ -78,8 +78,20 @@ void sevaluator_result_destroy(FullResult *result) {
     }
     else if (type == R_RAT) {
         mpq_clear(result->result.v_rat);
+    } else {
+        mpf_clear(result->result.v_flt);
     }
-    mpf_clear(result->result.v_flt);
+}
+
+void sevaluator_result_copy(FullResult *result, FullResult *src) {
+    sevaluator_result_init(result, src->result_type);
+    if (src->result_type == R_INT) {
+        mpz_set(result->result.v_int, src->result.v_int);
+    } else if (src->result_type == R_RAT) {
+        mpq_set(result->result.v_rat, src->result.v_rat);
+    } else {
+        mpf_set(result->result.v_flt, src->result.v_flt);
+    }
 }
 
 // do nothing if UNABLE to upgrade
@@ -212,10 +224,33 @@ void sevaluator_result_mod(FullResult *result, FullResult *op1, FullResult *op2)
     mpz_mod(result->result.v_int, op1->result.v_int, op2->result.v_int);
 }
 
+void sevaluator_result_neg(FullResult *result, FullResult *op1) {
+    sevaluator_result_init(result, op1->result_type);
+    if (op1->result_type == R_INT) {
+        mpz_neg(result->result.v_int, op1->result.v_int);
+    } else if (op1->result_type == R_RAT) {
+        mpq_neg(result->result.v_rat, op1->result.v_rat);
+    } else {
+        mpf_neg(result->result.v_flt, op1->result.v_flt);
+    }
+}
+
 // this function does NOT check whether `op1` is negative
 void sevaluator_result_sqrt(FullResult *result, FullResult *op1) {
     sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
     mpf_sqrt(result->result.v_flt, op1->result.v_flt);
+}
+
+int sevaluator_result_check_zero(FullResult *result) {
+    if (result->result_type == R_INT) {
+        return mpz_cmp_ui(result->result.v_int, 0);
+    } else if (result->result_type == R_RAT) {
+        return mpq_cmp_ui(result->result.v_rat, 0, 1);
+    } else if (result->result_type == R_FLT) {
+        return mpf_cmp_ui(result->result.v_flt, 0);
+    }
+    return 0;
 }
 
 char *sevaluator_result_get_str(FullResult *result, size_t digits) {
@@ -242,8 +277,11 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits) {
         size_t len = strlen(p);
 
         if (int_part > 0 && len > int_part) {
-            memcpy(q, p, int_part);
+            char temp_ch = p[int_part];
+            p[int_part] = '\0';
+            strcpy(q, p);
             strcat(q, ".");
+            p[int_part] = temp_ch;
             strcat(q, p + int_part);
         }
         else if (int_part == 0 && len > 0) {

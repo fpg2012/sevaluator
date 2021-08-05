@@ -4,7 +4,7 @@
 
 int test(const char *expr, HistoryList *list) {
     char *output;
-    int error = sevaluator_calc(expr, &output, list);
+    int error = sevaluator_calc(expr, &output, list, 5);
     if (error) {
         printf("error\n");
         return 1;
@@ -25,12 +25,27 @@ void test_result() {
 int main() {
     HistoryList *hist_list = sevaluator_history_create();
 
-    test("1 *100 - 10", hist_list);
-    test("hist[0]", hist_list);
-    test("hist[1] + hist[0]", hist_list);
-    test("random[]", hist_list);
-    test("hist[100]", hist_list);
-    test("hist[3]", hist_list);
+    test("10 + 3", hist_list);
+    test("10 * 3", hist_list);
+    test("10 - 3", hist_list);
+    test("10 / 3", hist_list);
+
+    test("-√2", hist_list);
+    test("--√√4", hist_list);
+
+    test("(1)", hist_list);
+    test("((1))", hist_list);
+    test("-(1)", hist_list);
+    test("(12+13)", hist_list);
+    test("(12-23)", hist_list);
+    test("(23-12)", hist_list);
+    test("(12 * 4)", hist_list);
+    test("(12 / 5)", hist_list);
+    test("(-1)", hist_list);
+    test("-√(216+3*123/√(1243-452))", hist_list);
+
+    test("10 / 0", hist_list);
+    test("-√(2-16)", hist_list);
 
     sevaluator_history_destory(hist_list);
 
