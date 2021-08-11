@@ -52,7 +52,7 @@ void sevaluator_result_init(FullResult *result, ResultType type) {
         mpq_init(result->result.v_rat);
     }
     else {
-        mpf_init(result->result.v_flt);
+        mpfr_init(result->result.v_flt);
     }
 }
 
@@ -66,7 +66,7 @@ void sevaluator_result_init_str(FullResult *result, ResultType type, const char 
             mpq_set_str(result->result.v_rat, str, 10);
             break;
         default:
-            mpf_set_str(result->result.v_flt, str, 10);
+            mpfr_set_str(result->result.v_flt, str, 10, MPFR_RNDN);
     }
 }
 
@@ -79,7 +79,7 @@ void sevaluator_result_destroy(FullResult *result) {
     else if (type == R_RAT) {
         mpq_clear(result->result.v_rat);
     } else {
-        mpf_clear(result->result.v_flt);
+        mpfr_clear(result->result.v_flt);
     }
 }
 
@@ -90,7 +90,7 @@ void sevaluator_result_copy(FullResult *result, FullResult *src) {
     } else if (src->result_type == R_RAT) {
         mpq_set(result->result.v_rat, src->result.v_rat);
     } else {
-        mpf_set(result->result.v_flt, src->result.v_flt);
+        mpfr_set(result->result.v_flt, src->result.v_flt, MPFR_RNDN);
     }
 }
 
@@ -119,31 +119,31 @@ void sevaluator_result_upgrade(FullResult *result, ResultType to_upgrade) {
         // R_RAT -> R_FLT
         if (result->result_type == R_RAT) {
             result->result_type = R_FLT;
-            mpf_t temp;
-            mpf_init(temp);
-            mpf_set_q(temp, result->result.v_rat);
+            mpfr_t temp;
+            mpfr_init(temp);
+            mpfr_set_q(temp, result->result.v_rat, MPFR_RNDN);
 
             mpq_clear(result->result.v_rat);
 
-            mpf_init(result->result.v_flt);
-            mpf_set(result->result.v_flt, temp);
+            mpfr_init(result->result.v_flt);
+            mpfr_set(result->result.v_flt, temp, MPFR_RNDN);
 
-            mpf_clear(temp);
+            mpfr_clear(temp);
             return;
         }
         // R_INT -> R_FLT
         else {
             result->result_type = R_FLT;
-            mpf_t temp;
-            mpf_init(temp);
-            mpf_set_z(temp, result->result.v_int);
+            mpfr_t temp;
+            mpfr_init(temp);
+            mpfr_set_z(temp, result->result.v_int, MPFR_RNDN);
 
             mpz_clear(result->result.v_int);
 
-            mpf_init(result->result.v_flt);
-            mpf_set(result->result.v_flt, temp);
+            mpfr_init(result->result.v_flt);
+            mpfr_set(result->result.v_flt, temp, MPFR_RNDN);
 
-            mpf_clear(temp);
+            mpfr_clear(temp);
             return;
         }
     }
@@ -163,7 +163,7 @@ void sevaluator_result_add(FullResult *result, FullResult *op1, FullResult *op2)
     }
     else {
         sevaluator_result_init(result, R_FLT);
-        mpf_add(result->result.v_flt, op1->result.v_flt, op2->result.v_flt);
+        mpfr_add(result->result.v_flt, op1->result.v_flt, op2->result.v_flt, MPFR_RNDN);
     }
 }
 
@@ -181,7 +181,7 @@ void sevaluator_result_sub(FullResult *result, FullResult *op1, FullResult *op2)
     }
     else {
         sevaluator_result_init(result, R_FLT);
-        mpf_sub(result->result.v_flt, op1->result.v_flt, op2->result.v_flt);
+        mpfr_sub(result->result.v_flt, op1->result.v_flt, op2->result.v_flt, MPFR_RNDN);
     }
 }
 
@@ -199,7 +199,7 @@ void sevaluator_result_mul(FullResult *result, FullResult *op1, FullResult *op2)
     }
     else {
         sevaluator_result_init(result, R_FLT);
-        mpf_mul(result->result.v_flt, op1->result.v_flt, op2->result.v_flt);
+        mpfr_mul(result->result.v_flt, op1->result.v_flt, op2->result.v_flt, MPFR_RNDN);
     }
 }
 
@@ -214,7 +214,7 @@ void sevaluator_result_div(FullResult *result, FullResult *op1, FullResult *op2)
     }
     else {
         sevaluator_result_init(result, R_FLT);
-        mpf_div(result->result.v_flt, op1->result.v_flt, op2->result.v_flt);
+        mpfr_div(result->result.v_flt, op1->result.v_flt, op2->result.v_flt, MPFR_RNDN);
     }
 }
 
@@ -231,7 +231,7 @@ void sevaluator_result_neg(FullResult *result, FullResult *op1) {
     } else if (op1->result_type == R_RAT) {
         mpq_neg(result->result.v_rat, op1->result.v_rat);
     } else {
-        mpf_neg(result->result.v_flt, op1->result.v_flt);
+        mpfr_neg(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
     }
 }
 
@@ -239,7 +239,7 @@ void sevaluator_result_neg(FullResult *result, FullResult *op1) {
 void sevaluator_result_sqrt(FullResult *result, FullResult *op1) {
     sevaluator_result_upgrade(op1, R_FLT);
     sevaluator_result_init(result, R_FLT);
-    mpf_sqrt(result->result.v_flt, op1->result.v_flt);
+    mpfr_sqrt(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
 }
 
 int sevaluator_result_check_zero(FullResult *result) {
@@ -248,7 +248,7 @@ int sevaluator_result_check_zero(FullResult *result) {
     } else if (result->result_type == R_RAT) {
         return mpq_cmp_ui(result->result.v_rat, 0, 1);
     } else if (result->result_type == R_FLT) {
-        return mpf_cmp_ui(result->result.v_flt, 0);
+        return mpfr_cmp_ui(result->result.v_flt, 0);
     }
     return 0;
 }
@@ -263,7 +263,7 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits) {
         return temp;
     } else {
         mp_exp_t exp;
-        temp = mpf_get_str(NULL, &exp, 10, digits, result->result.v_flt);
+        temp = mpfr_get_str(NULL, &exp, 10, digits, result->result.v_flt, MPFR_RNDN);
         char *temp2 = (char*) malloc(strlen(temp) + digits + 10);
 
         long int_part = exp;

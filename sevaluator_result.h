@@ -3,11 +3,12 @@
 #include <gmp.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <mpfr.h>
 
 typedef union result {
     mpz_t v_int;
     mpq_t v_rat;
-    mpf_t v_flt;
+    mpfr_t v_flt;
 } Result;
 
 typedef enum result_type {
