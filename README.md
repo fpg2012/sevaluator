@@ -13,23 +13,23 @@ usage example (see test.c):
 
 int main() {
     char *output;
-	HistoryList *hist_list = sevaluator_history_create();
+    HistoryList *hist_list = sevaluator_history_create();
 
-	sevaluator_calc("10 + 3 * 3 / 2", &output, list, 5)
-	printf("%s\n", output);
+    sevaluator_calc("10 + 3 * 3 / 2", &output, list, 5)
+    printf("%s\n", output);
 
-	sevaluator_calc("-√(216+3*123/√(1243-452))", &output, list, 5)
-	printf("%s\n", output);
+    sevaluator_calc("-√(216+3*123/√(1243-452))", &output, list, 5)
+    printf("%s\n", output);
 
-	sevaluator_calc("(ans) * 2", &output, list, 5)
-	printf("%s\n", output);
+    sevaluator_calc("(ans) * 2", &output, list, 5)
+    printf("%s\n", output);
 
-	sevaluator_calc("hist[0] * 2", &output, list, 5)
-	printf("%s\n", output);
+    sevaluator_calc("hist[0] * 2", &output, list, 5)
+    printf("%s\n", output);
 
-	free(output);
-	sevaluator_history_destory(hist_list);
-	return 0;
+    free(output);
+    sevaluator_history_destory(hist_list);
+    return 0;
 }
 ```
 

@@ -43,12 +43,15 @@ int main() {
     test("(12 / 5)", hist_list);
     test("(-1)", hist_list);
     test("-√(216+3*123/√(1243-452))", hist_list);
+    test("10 % 3", hist_list);
 
-    test("10 / 0", hist_list);
-    test("-√(2-16)", hist_list);
-
+    // test history
     test("(ans) * 2", hist_list);
     test("hist[7]", hist_list);
+
+    // should be error
+    test("10 / 0", hist_list);
+    test("-√(2-16)", hist_list);
 
     sevaluator_history_destory(hist_list);
 

@@ -26,6 +26,7 @@ static ErrorType error_type;
 #define SE_DIV(a, b, c) sevaluator_result_div(&(a), &(b), &(c))
 #define SE_NEG(a, b) sevaluator_result_neg(&(a), &(b))
 #define SE_SQRT(a, b) sevaluator_result_sqrt(&(a), &(b))
+#define SE_MOD(a, b, c)  sevaluator_result_mod(&(a), &(b), &(c))
 
 #define SE_CHECK_ZERO(a) sevaluator_result_check_zero(&(a))
 
@@ -70,7 +71,23 @@ expr: expr PLUS fact { SE_ADD($$, $1, $3); SE_DESTROY($1); SE_DESTROY($3); }
     | expr MINUS fact { SE_SUB($$, $1, $3); SE_DESTROY($1); SE_DESTROY($3); }
     | fact { SE_COPY($$, $1); SE_DESTROY($1); }
     ;
-fact: fact MULTIPLY root { SE_MUL($$, $1, $3); SE_DESTROY($1); SE_DESTROY($3); }
+fact: 
+    fact MOD root {
+        if (SE_CHECK_ZERO($3) == 0) {
+            fprintf(stderr, "mod 0\n");
+            error_type = E_DIV_ZERO;
+            YYABORT;
+        }
+        if ($1.result_type != R_INT || $3.result_type != R_INT) {
+            fprintf(stderr, "mod operands should be integers\n");
+            error_type = E_TYPE;
+            YYABORT;
+        }
+        SE_MOD($$, $1, $3);
+        SE_DESTROY($1);
+        SE_DESTROY($3);
+    }
+    | fact MULTIPLY root { SE_MUL($$, $1, $3); SE_DESTROY($1); SE_DESTROY($3); }
     | fact DIVIDE root {
         if (SE_CHECK_ZERO($3) == 0) {
             fprintf(stderr, "divide 0\n");
