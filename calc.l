@@ -40,6 +40,25 @@ void from_decimal(mpq_t, const char *);
 "hist" { return FUNC_HIST; }
 "random" { return FUNC_RANDOM; }
 "ans" { return ANS; }
+"exp" { return FUNC_EXP; }
+"log2" { return FUNC_LOG2; }
+"log10" { return FUNC_LOG10; }
+"ln" { return FUNC_LN; }
+"log" { return FUNC_LOG; }
+"asin" { return FUNC_ASIN; }
+"acos" { return FUNC_ACOS; }
+"atan" { return FUNC_ATAN; }
+"sin" { return FUNC_SIN; }
+"cos" { return FUNC_COS; }
+"tan" { return FUNC_TAN; }
+"cot" { return FUNC_COT; }
+"sec" { return FUNC_SEC; }
+"csc" { return FUNC_CSC; }
+"root" { return FUNC_ROOT; }
+"abs" { return FUNC_ABS; }
+"π" { return CONST_PI; }
+"pi" { return CONST_PI; }
+"e" { return CONST_E; }
 
 %%
 

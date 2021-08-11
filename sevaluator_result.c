@@ -1,4 +1,5 @@
 #include "sevaluator_result.h"
+#include <limits.h>
 #include <string.h>
 
 /*
@@ -28,6 +29,20 @@ static ResultType _add_result_type(ResultType op1, ResultType op2) {
 static ResultType _div_result_type(ResultType op1, ResultType op2) {
     if (op1 != R_FLT && op2 != R_FLT) {
         return R_RAT;
+    }
+    return R_FLT;
+}
+
+/*
+    Z Q R (op1)
+  Z Z Q R
+  Q R R R
+  R R R R
+(op2)
+*/
+static ResultType _pow_result_type(ResultType op1, ResultType op2) {
+    if (op2 == R_INT) {
+        return op1;
     }
     return R_FLT;
 }
@@ -240,6 +255,117 @@ void sevaluator_result_sqrt(FullResult *result, FullResult *op1) {
     sevaluator_result_upgrade(op1, R_FLT);
     sevaluator_result_init(result, R_FLT);
     mpfr_sqrt(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_root_n(FullResult *result, FullResult *op1, unsigned long op2) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_rootn_ui(result->result.v_flt, op1->result.v_flt, op2, MPFR_RNDN);
+}
+
+void sevaluator_result_pow(FullResult *result, FullResult *op1, FullResult *op2) {
+    ResultType result_type = _pow_result_type(op1->result_type, op2->result_type);
+    int negexp_flag = 0;
+    if (result_type == R_INT || result_type == R_RAT) {
+        if (mpz_cmp_si(op2->result.v_int, 0) < 0)
+        {
+            result_type = R_RAT;
+            negexp_flag = 1;
+            mpz_neg(op2->result.v_int, op2->result.v_int);
+        }
+        if (mpz_cmp_ui(op2->result.v_int, ULONG_MAX) >= 0) 
+        {
+            result_type = R_FLT;
+        }
+    }
+    if (result_type == R_INT) {
+        unsigned long exp = mpz_get_ui(op2->result.v_int);
+        sevaluator_result_init(result, R_INT);
+        mpz_pow_ui(result->result.v_int, op1->result.v_int, exp);
+    }
+    else if (result_type == R_RAT) {
+        sevaluator_result_upgrade(op1, R_RAT);
+        unsigned long exp = mpz_get_ui(op2->result.v_int);
+        mpz_pow_ui(mpq_numref(op1->result.v_rat), mpq_numref(op1->result.v_rat), exp);
+        mpz_pow_ui(mpq_denref(op1->result.v_rat), mpq_denref(op1->result.v_rat), exp);
+        sevaluator_result_init(result, R_RAT);
+        if (negexp_flag) {
+            mpq_set_num(result->result.v_rat, mpq_denref(op1->result.v_rat));
+            mpq_set_den(result->result.v_rat, mpq_numref(op1->result.v_rat));
+        } else {
+            mpq_set(result->result.v_rat, op1->result.v_rat);
+        }
+    } else {
+        sevaluator_result_upgrade(op1, R_FLT);
+        if (op2->result_type == R_RAT) {
+            unsigned long root = mpz_get_ui(mpq_denref(op2->result.v_rat));
+            sevaluator_result_root_n(result, op1, root);
+            mpfr_pow_z(result->result.v_flt, result->result.v_flt, mpq_numref(op2->result.v_rat), MPFR_RNDN);
+        } else {
+            sevaluator_result_init(result, R_FLT);
+            mpfr_pow(result->result.v_flt, op1->result.v_flt, op2->result.v_flt, MPFR_RNDN);
+        }
+    }
+}
+
+void sevaluator_result_exp(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_exp(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_ln(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_log(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_log2(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_log2(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_log10(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_log10(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_sin(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_sin(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_cos(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_cos(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_tan(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_tan(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_cot(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_cot(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_sec(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_sec(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_csc(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_csc(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
 }
 
 int sevaluator_result_check_zero(FullResult *result) {

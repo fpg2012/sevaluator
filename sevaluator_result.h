@@ -60,6 +60,20 @@ void sevaluator_result_neg(FullResult *result, FullResult *op1);
 // this function does NOT check whether `op1` is negative
 void sevaluator_result_sqrt(FullResult *result, FullResult *op1);
 
+void sevaluator_result_ln(FullResult *result, FullResult *op1);
+void sevaluator_result_log2(FullResult *result, FullResult *op1);
+void sevaluator_result_log10(FullResult *result, FullResult *op1);
+void sevaluator_result_exp(FullResult *result, FullResult *op1);
+
+void sevaluator_result_sin(FullResult *result, FullResult *op1);
+void sevaluator_result_cos(FullResult *result, FullResult *op1);
+void sevaluator_result_tan(FullResult *result, FullResult *op1);
+void sevaluator_result_cot(FullResult *result, FullResult *op1);
+void sevaluator_result_sec(FullResult *result, FullResult *op1);
+void sevaluator_result_csc(FullResult *result, FullResult *op1);
+
+void sevaluator_result_pow(FullResult *result, FullResult *op1, FullResult *op2);
+
 int sevaluator_result_check_zero(FullResult *result);
 
 char *sevaluator_result_get_str(FullResult *result, size_t digits);

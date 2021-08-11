@@ -6,10 +6,10 @@ int test(const char *expr, HistoryList *list) {
     char *output;
     int error = sevaluator_calc(expr, &output, list, 5);
     if (error) {
-        printf("error\n");
+        printf("\"%s\" => error\n", expr);
         return 1;
     }
-    printf("%s\n", output);
+    printf("\"%s\" => %s\n", expr, output);
     free(output);
 }
 
@@ -45,6 +45,29 @@ int main() {
     test("-√(216+3*123/√(1243-452))", hist_list);
     test("10 % 3", hist_list);
 
+    // test log
+    test("log10[100]", hist_list);
+    test("log2[log2[256]]", hist_list);
+    test("ln[e*e + e - e]", hist_list);
+    test("e", hist_list);
+
+    // test triangular
+    test("sin[pi/6]", hist_list);
+    test("cos[pi/6]", hist_list);
+    test("cot[pi/4 * 3]", hist_list);
+    test("tan[pi/4 * 3]", hist_list);
+    test("sec[pi/6]", hist_list);
+    test("csc[pi/6]", hist_list);
+
+    // test exp
+    test("2^2^3", hist_list);
+    test("2^(1/2)", hist_list);
+    test("1.1^100", hist_list);
+    test("2^(-1)", hist_list);
+    test("(-2)^(1/3)", hist_list);
+    test("(-2)^(2/5)", hist_list);
+    test("(-2)^(-0.4)", hist_list);
+
     // test history
     test("(ans) * 2", hist_list);
     test("hist[7]", hist_list);
@@ -52,6 +75,11 @@ int main() {
     // should be error
     test("10 / 0", hist_list);
     test("-√(2-16)", hist_list);
+    test("hist[2.1]", hist_list);
+    test("tan[pi/2]", hist_list);
+    test("0^(-1)", hist_list);
+    test("(-1)^(1/2)", hist_list);
+    test("(-1)^(0.5)", hist_list);
 
     sevaluator_history_destory(hist_list);
 
