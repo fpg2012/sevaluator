@@ -13,7 +13,7 @@ typedef enum error_type {
     E_OK,
     E_SYNTAX,
     E_DIV_ZERO,
-    E_NEGTIVE_ROOT,
+    E_NEGATIVE_ROOT,
     E_NO_HISTORY,
     E_TYPE,
     E_INVALID_PARAMETER

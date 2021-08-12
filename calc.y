@@ -38,11 +38,13 @@ static ErrorType error_type;
 #define SE_COT(a, b) sevaluator_result_cot(&(a), &(b))
 #define SE_SEC(a, b) sevaluator_result_sec(&(a), &(b))
 #define SE_CSC(a, b) sevaluator_result_csc(&(a), &(b))
-#define SE_ASIN(a, b)
-#define SE_ACOS(a, b)
-#define SE_ATAN(a, b)
+#define SE_ASIN(a, b) sevaluator_result_asin(&(a), &(b))
+#define SE_ACOS(a, b) sevaluator_result_acos(&(a), &(b))
+#define SE_ATAN(a, b) sevaluator_result_atan(&(a), &(b))
 #define SE_POW(a, b, c) sevaluator_result_pow(&(a), &(b), &(c))
+#define SE_ROOT_N(a, b, c) sevaluator_result_root_n(&(a), &(b), c)
 
+#define SE_CMP_SI(a, b) sevaluator_result_cmp_si(&(a), (b))
 #define SE_CHECK_ZERO(a) sevaluator_result_check_zero(&(a))
 
 %}
@@ -128,7 +130,7 @@ root:
     SQRT root {
         if (SE_CHECK_ZERO($2) < 0) {
             fprintf(stderr, "negative root\n");
-            error_type = E_NEGTIVE_ROOT;
+            error_type = E_NEGATIVE_ROOT;
             YYABORT;
         }
         SE_SQRT($$, $2);
@@ -146,14 +148,14 @@ root:
             mpz_cmp_ui(mpq_denref($3.result.v_rat), ULONG_MAX) >= 0)
         ) {
             fprintf(stderr, "negative root\n");
-            error_type = E_NEGTIVE_ROOT;
+            error_type = E_NEGATIVE_ROOT;
             YYABORT;
         }
         else if ($3.result_type == R_FLT &&
             SE_CHECK_ZERO($1) < 0
         ) {
             fprintf(stderr, "negative root\n");
-            error_type = E_NEGTIVE_ROOT;
+            error_type = E_NEGATIVE_ROOT;
             YYABORT;
         }
         SE_POW($$, $1, $3);
@@ -218,6 +220,47 @@ number:
     | FUNC_COT F_LEFT expr F_RIGHT {
         SE_COT($$, $3);
         SE_DESTROY($3);
+    }
+    | FUNC_ASIN F_LEFT expr F_RIGHT {
+        if (SE_CMP_SI($3, -1) < 0 || SE_CMP_SI($3, 1) > 0) {
+            fprintf(stderr, "invalid parameters\n");
+            error_type = E_INVALID_PARAMETER;
+            YYABORT;
+        }
+        SE_ASIN($$, $3);
+        SE_DESTROY($3);
+    }
+    | FUNC_ACOS F_LEFT expr F_RIGHT {
+        if (SE_CMP_SI($3, -1) < 0 || SE_CMP_SI($3, 1) > 0) {
+            fprintf(stderr, "invalid parameters\n");
+            error_type = E_INVALID_PARAMETER;
+            YYABORT;
+        }
+        SE_ACOS($$, $3);
+        SE_DESTROY($3);
+    }
+    | FUNC_ATAN F_LEFT expr F_RIGHT {
+        SE_ATAN($$, $3);
+        SE_DESTROY($3);
+    }
+    | FUNC_ROOT F_LEFT expr COMMA expr F_RIGHT {
+        if ($5.result_type != R_INT || SE_CHECK_ZERO($5) < 0) {
+            fprintf(stderr, "root degree should be positive integer\n");
+            error_type = E_INVALID_PARAMETER;
+            YYABORT;
+        }
+        if (SE_CHECK_ZERO($3) < 0 &&
+            (mpz_even_p($5.result.v_int) ||
+            mpz_cmp_ui($5.result.v_int, ULONG_MAX) >= 0)) 
+        {
+            fprintf(stderr, "negative root\n");
+            error_type = E_NEGATIVE_ROOT;
+            YYABORT;
+        }
+        unsigned long degree = mpz_get_ui($5.result.v_int);
+        SE_ROOT_N($$, $3, degree);
+        SE_DESTROY($3);
+        SE_DESTROY($5);
     }
     | literal { SE_COPY($$, $1); }
     ;

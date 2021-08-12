@@ -58,6 +58,9 @@ int main() {
     test("tan[pi/4 * 3]", hist_list);
     test("sec[pi/6]", hist_list);
     test("csc[pi/6]", hist_list);
+    test("asin[(√2/2)]*4", hist_list);
+    test("acos[(√2/2)]/pi", hist_list);
+    test("(atan[1] - atan[-1])*2", hist_list);
 
     // test exp
     test("2^2^3", hist_list);
@@ -67,6 +70,7 @@ int main() {
     test("(-2)^(1/3)", hist_list);
     test("(-2)^(2/5)", hist_list);
     test("(-2)^(-0.4)", hist_list);
+    test("root[-8, 3]", hist_list);
 
     // test history
     test("(ans) * 2", hist_list);
@@ -80,6 +84,9 @@ int main() {
     test("0^(-1)", hist_list);
     test("(-1)^(1/2)", hist_list);
     test("(-1)^(0.5)", hist_list);
+    test("root[-8, 2]", hist_list);
+    test("root[8, 1.5]", hist_list);
+    test("asin[-2]", hist_list);
 
     sevaluator_history_destory(hist_list);
 

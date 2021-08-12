@@ -368,6 +368,24 @@ void sevaluator_result_csc(FullResult *result, FullResult *op1) {
     mpfr_csc(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
 }
 
+void sevaluator_result_atan(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_atan(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_asin(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_asin(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_acos(FullResult *result, FullResult *op1) {
+    sevaluator_result_upgrade(op1, R_FLT);
+    sevaluator_result_init(result, R_FLT);
+    mpfr_acos(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
+}
+
 int sevaluator_result_check_zero(FullResult *result) {
     if (result->result_type == R_INT) {
         return mpz_cmp_ui(result->result.v_int, 0);
@@ -375,6 +393,17 @@ int sevaluator_result_check_zero(FullResult *result) {
         return mpq_cmp_ui(result->result.v_rat, 0, 1);
     } else if (result->result_type == R_FLT) {
         return mpfr_cmp_ui(result->result.v_flt, 0);
+    }
+    return 0;
+}
+
+int sevaluator_result_cmp_si(FullResult *result, long si) {
+    if (result->result_type == R_INT) {
+        return mpz_cmp_si(result->result.v_int, si);
+    } else if (result->result_type == R_RAT) {
+        return mpq_cmp_si(result->result.v_rat, si, 1);
+    } else if (result->result_type == R_FLT) {
+        return mpfr_cmp_si(result->result.v_flt, si);
     }
     return 0;
 }
