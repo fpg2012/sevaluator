@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include "sevaluator_result.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct history_node {
     char *p;
     ResultType type;
@@ -28,5 +32,9 @@ int sevaluator_history_get_length(HistoryList *list);
 void sevaluator_history_push(HistoryList *list, const char *p, ResultType type);
 
 void sevaluator_history_print(HistoryList *list);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

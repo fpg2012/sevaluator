@@ -4,6 +4,10 @@
 #include "sevaluator_history.h"
 #include "sevaluator_result.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum mode {
     DEFAULT,
     NO_HISTORY,
@@ -20,5 +24,9 @@ typedef enum error_type {
 } ErrorType;
 
 ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

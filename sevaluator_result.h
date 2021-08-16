@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <mpfr.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef union result {
     mpz_t v_int;
     mpq_t v_rat;
@@ -82,5 +86,9 @@ int sevaluator_result_check_zero(FullResult *result);
 int sevaluator_result_cmp_si(FullResult *result, long si);
 
 char *sevaluator_result_get_str(FullResult *result, size_t digits);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
