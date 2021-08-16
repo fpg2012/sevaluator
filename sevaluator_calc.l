@@ -7,7 +7,7 @@
 #include <stdbool.h>
 #define YY_DECL int yylex()
 #include "sevaluator_result.h"
-#include "calc.tab.h"
+#include "sevaluator_calc.tab.h"
 
 void from_decimal(mpq_t, const char *);
 %}

@@ -1,7 +1,10 @@
 libsevaluator.so
 calc.tab.c
+sevaluator_calc.tab.c
 lex.yy.c
 calc.tab.h
+sevaluator_calc.tab.h
 calc.output
+sevaluator_calc.output
 test
 .vscode
