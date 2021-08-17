@@ -8,3 +8,4 @@ calc.output
 sevaluator_calc.output
 test
 .vscode
+*.deb
