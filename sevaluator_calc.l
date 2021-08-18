@@ -56,6 +56,7 @@ void from_decimal(mpq_t, const char *);
 "csc" { return FUNC_CSC; }
 "root" { return FUNC_ROOT; }
 "abs" { return FUNC_ABS; }
+"flt" { return FUNC_FLT; }
 "π" { return CONST_PI; }
 "pi" { return CONST_PI; }
 "e" { return CONST_E; }

@@ -16,6 +16,6 @@ Installed-Size: 1
 Description: simple/super expression evaluation library with big number support.""" > pkg-debian/DEBIAN/control
 cp *.so -t pkg-debian/usr/lib/
 cp *.h -t pkg-debian/usr/include/
-dpkg -b pkg-debian/ sevaluator_amd64.deb
+dpkg -b pkg-debian/ libsevaluator_amd64.deb
 rm -r pkg-debian
 make clean

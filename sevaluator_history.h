@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 typedef struct history_node {
+    char *input;
     char *p;
     ResultType type;
     struct history_node *next_node;
@@ -29,7 +30,7 @@ ResultType sevaluator_history_get_type(HistoryList *list, int k);
 
 int sevaluator_history_get_length(HistoryList *list);
 
-void sevaluator_history_push(HistoryList *list, const char *p, ResultType type);
+void sevaluator_history_push(HistoryList *list, const char *input, const char *p, ResultType type);
 
 void sevaluator_history_print(HistoryList *list);
 

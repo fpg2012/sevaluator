@@ -66,7 +66,7 @@ static ErrorType error_type;
 %token FUNC_LOG2 FUNC_LOG10 FUNC_LN FUNC_LOG FUNC_EXP
 %token FUNC_SIN FUNC_COS FUNC_TAN FUNC_COT FUNC_CSC FUNC_SEC
 %token FUNC_ASIN FUNC_ACOS FUNC_ATAN
-%token FUNC_ABS
+%token FUNC_ABS FUNC_FLT
 %token CONST_PI CONST_E
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MOD
@@ -243,6 +243,11 @@ number:
         SE_ATAN($$, $3);
         SE_DESTROY($3);
     }
+    | FUNC_FLT F_LEFT expr F_RIGHT {
+        SE_COPY($$, $3);
+        sevaluator_result_upgrade(&$$, R_FLT);
+        SE_DESTROY($3);
+    }
     | FUNC_ROOT F_LEFT expr COMMA expr F_RIGHT {
         if ($5.result_type != R_INT || SE_CHECK_ZERO($5) < 0) {
             fprintf(stderr, "root degree should be positive integer\n");
@@ -290,6 +295,7 @@ literal:
         }
         ResultType type = sevaluator_history_get_type(history_list, index);
         sevaluator_result_init_str(&$$, type, hist_result);
+        mpz_clear($3);
     }
     | FUNC_RANDOM F_LEFT F_RIGHT {
         unsigned long temp = gmp_urandomb_ui(random_state, 8);
@@ -333,11 +339,10 @@ ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, s
     } else {
         *output = sevaluator_result_get_str(&final_result, float_digits);
         if (mode != NO_HISTORY) {
-            sevaluator_history_push(history_list, *output, final_result.result_type);
+            sevaluator_history_push(history_list, input, *output, final_result.result_type);
             sevaluator_result_destroy(&final_result);
         }
     }
-    
     history_list = NULL;
     yylex_destroy();
     gmp_randclear(random_state);

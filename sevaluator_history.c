@@ -7,6 +7,7 @@ static HistortyNode* _get_recent_node(HistoryList *list) {
 
 static void _destroy_node(HistortyNode *node) {
     free(node->p);
+    free(node->input);
     free(node);
 }
 
@@ -17,6 +18,7 @@ HistoryList *sevaluator_history_create() {
 
     list->first_node->next_node = NULL;
     list->first_node->p = NULL;
+    list->first_node->input = NULL;
 
     list->len = 0;
     return list;
@@ -54,17 +56,31 @@ ResultType sevaluator_history_get_type(HistoryList *list, int k) {
     return current_node->next_node->type;
 }
 
+const char *sevaluator_get_history_input(HistoryList *list, int k) {
+    if (k >= list->len) {
+        return NULL;
+    }
+    HistortyNode *current_node = list->first_node;
+    for (int i = list->len-1; i > k; --i) {
+        current_node = current_node->next_node;
+    }
+    return current_node->next_node->input;
+}
+
 int sevaluator_history_get_length(HistoryList *list) {
     return list->len;
 }
 
-void sevaluator_history_push(HistoryList *list, const char *p, ResultType type) {
+void sevaluator_history_push(HistoryList *list, const char *input, const char *p, ResultType type) {
     HistortyNode *node = (HistortyNode*) malloc(sizeof(HistortyNode));
 
     char *str = (char*) malloc(strlen(p) + 1);
     strcpy(str, p);
+    char *input_str = (char*) malloc(strlen(input) + 1);
+    strcpy(input_str, input);
 
     node->p = str;
+    node->input = input_str;
     node->type = type;
     node->next_node = list->first_node->next_node;
 

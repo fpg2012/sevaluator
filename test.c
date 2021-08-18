@@ -76,6 +76,9 @@ int main() {
     test("(ans) * 2", hist_list);
     test("hist[7]", hist_list);
 
+    // test flt[]
+    test("flt[1.1^10]", hist_list);
+
     // should be error
     test("10 / 0", hist_list);
     test("-√(2-16)", hist_list);
