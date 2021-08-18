@@ -10,7 +10,7 @@ Architecture: amd64
 Essential: no
 Section: utils
 Priority: optional
-Depends: libgmp10, libmpfr6
+Depends: libgmp10, libmpfr6, libgmp10-dev, libmpfr-dev
 Maintainer: nth233<fpg2012@yeah.net>
 Installed-Size: 1
 Description: simple/super expression evaluation library with big number support.""" > pkg-debian/DEBIAN/control
