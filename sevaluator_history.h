@@ -10,8 +10,7 @@ extern "C" {
 
 typedef struct history_node {
     char *input;
-    char *p;
-    ResultType type;
+    FullResult *result;
     struct history_node *next_node;
 } HistortyNode;
 
@@ -24,15 +23,17 @@ HistoryList *sevaluator_history_create();
 
 void sevaluator_history_destory(HistoryList *list);
 
-const char *sevaluator_history_get(HistoryList *list, int k);
+FullResult *sevaluator_history_get(HistoryList *list, int k);
 
 ResultType sevaluator_history_get_type(HistoryList *list, int k);
 
+const char *sevaluator_history_get_input(HistoryList *list, int k);
+
 int sevaluator_history_get_length(HistoryList *list);
 
-void sevaluator_history_push(HistoryList *list, const char *input, const char *p, ResultType type);
+void sevaluator_history_push(HistoryList *list, const char *input, FullResult *result);
 
-void sevaluator_history_print(HistoryList *list);
+// void sevaluator_history_print(HistoryList *list);
 
 #ifdef __cplusplus
 }

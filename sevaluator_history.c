@@ -6,7 +6,8 @@ static HistortyNode* _get_recent_node(HistoryList *list) {
 }
 
 static void _destroy_node(HistortyNode *node) {
-    free(node->p);
+    sevaluator_result_destroy(node->result);
+    free(node->result);
     free(node->input);
     free(node);
 }
@@ -17,7 +18,7 @@ HistoryList *sevaluator_history_create() {
     list->first_node = (HistortyNode*) malloc(sizeof(HistortyNode));
 
     list->first_node->next_node = NULL;
-    list->first_node->p = NULL;
+    list->first_node->result = NULL;
     list->first_node->input = NULL;
 
     list->len = 0;
@@ -34,7 +35,7 @@ void sevaluator_history_destory(HistoryList *list) {
     free(list);
 }
 
-const char *sevaluator_history_get(HistoryList *list, int k) {
+FullResult *sevaluator_history_get(HistoryList *list, int k) {
     if (k >= list->len) {
         return NULL;
     }
@@ -42,7 +43,7 @@ const char *sevaluator_history_get(HistoryList *list, int k) {
     for (int i = list->len-1; i > k; --i) {
         current_node = current_node->next_node;
     }
-    return current_node->next_node->p;
+    return current_node->next_node->result;
 }
 
 ResultType sevaluator_history_get_type(HistoryList *list, int k) {
@@ -53,10 +54,11 @@ ResultType sevaluator_history_get_type(HistoryList *list, int k) {
     for (int i = list->len-1; i > k; --i) {
         current_node = current_node->next_node;
     }
-    return current_node->next_node->type;
+    return current_node->next_node->result->result_type;
 }
 
-const char *sevaluator_get_history_input(HistoryList *list, int k) {
+const char *sevaluator_history_get_input(HistoryList *list, int k)
+{
     if (k >= list->len) {
         return NULL;
     }
@@ -71,27 +73,25 @@ int sevaluator_history_get_length(HistoryList *list) {
     return list->len;
 }
 
-void sevaluator_history_push(HistoryList *list, const char *input, const char *p, ResultType type) {
+void sevaluator_history_push(HistoryList *list, const char *input, FullResult *result) {
     HistortyNode *node = (HistortyNode*) malloc(sizeof(HistortyNode));
 
-    char *str = (char*) malloc(strlen(p) + 1);
-    strcpy(str, p);
     char *input_str = (char*) malloc(strlen(input) + 1);
     strcpy(input_str, input);
+    node->result = (FullResult *) malloc(sizeof(FullResult));
 
-    node->p = str;
+    sevaluator_result_copy(node->result, result);
     node->input = input_str;
-    node->type = type;
     node->next_node = list->first_node->next_node;
 
     list->first_node->next_node = node;
     list->len++;
 }
 
-void sevaluator_history_print(HistoryList *list) {
-    HistortyNode *cur = list->first_node->next_node;
-    while (cur) {
-        printf("%s\n", cur->p);
-        cur = cur->next_node;
-    }
-}
+// void sevaluator_history_print(HistoryList *list) {
+//     HistortyNode *cur = list->first_node->next_node;
+//     while (cur) {
+//         printf("%s\n", cur->p);
+//         cur = cur->next_node;
+//     }
+// }

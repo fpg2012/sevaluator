@@ -272,12 +272,11 @@ number:
 literal: 
     ANS {
         if (mode == NO_HISTORY) { error_type = E_NO_HISTORY; YYABORT; }
-        const char *hist_result = sevaluator_history_get(history_list, history_list->len-1);
+        FullResult *hist_result = sevaluator_history_get(history_list, history_list->len-1);
         if (!hist_result) {
             YYABORT;
         }
-        ResultType type = sevaluator_history_get_type(history_list, history_list->len-1);
-        sevaluator_result_init_str(&$$, type, hist_result);
+        SE_COPY($$, *hist_result);
     }
     | FUNC_HIST F_LEFT INTEGER F_RIGHT { 
         if (mode == NO_HISTORY) { error_type = E_NO_HISTORY; YYABORT; } 
@@ -287,14 +286,13 @@ literal:
             YYABORT;
         }
         int index = (int) mpz_get_ui($3);
-        const char *hist_result = sevaluator_history_get(history_list, index);
+        FullResult *hist_result = sevaluator_history_get(history_list, index);
         if (!hist_result) {
             mpz_clear($3);
             error_type = E_NO_HISTORY; 
             YYABORT;
         }
-        ResultType type = sevaluator_history_get_type(history_list, index);
-        sevaluator_result_init_str(&$$, type, hist_result);
+        SE_COPY($$, *hist_result);
         mpz_clear($3);
     }
     | FUNC_RANDOM F_LEFT F_RIGHT {
@@ -339,7 +337,7 @@ ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, s
     } else {
         *output = sevaluator_result_get_str(&final_result, float_digits);
         if (mode != NO_HISTORY) {
-            sevaluator_history_push(history_list, input, *output, final_result.result_type);
+            sevaluator_history_push(history_list, input, &final_result);
             sevaluator_result_destroy(&final_result);
         }
     }
