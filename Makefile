@@ -1,7 +1,7 @@
 all: sevaluator
 
 sevaluator_calc.tab.c sevaluator_calc.tab.h:	sevaluator_calc.y
-	bison -t -v -d sevaluator_calc.y -Wcounterexamples
+	bison -t -v -d sevaluator_calc.y
 
 lex.yy.c: sevaluator_calc.l sevaluator_calc.tab.h
 	flex sevaluator_calc.l
