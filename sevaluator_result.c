@@ -415,50 +415,43 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits) {
         return temp;
     } else if (result->result_type == R_RAT) {
         temp = mpq_get_str(NULL, 10, result->result.v_rat);
+        
+        int flag = 0;
+        mpz_t a;
+        mpz_init(a);
+        mpq_get_den(a, result->result.v_rat);
+        char *temp_a = mpz_get_str(NULL, 10, a);
+        char *p = temp_a;
+        if (*p == '1') {
+            flag = 1;
+        }
+        ++p;
+        while(*p && flag) {
+            if (*p == '0') {
+                ++p;
+            } else {
+                flag = 0;
+            }
+        }
+        free(temp_a);
+        if (flag || strlen(temp) > 20)
+        {
+            sevaluator_result_upgrade(result, R_FLT);
+            free(temp);
+            temp = (char *)malloc(1000000);
+            mpfr_sprintf(temp, "%Rf", result->result.v_flt);
+            char *temp2 = (char *)malloc(strlen(temp) + 1);
+            strcpy(temp2, temp);
+            free(temp);
+            temp = temp2;
+        }
+        mpz_clear(a);
         return temp;
     } else {
-        mp_exp_t exp;
-        temp = mpfr_get_str(NULL, &exp, 10, digits, result->result.v_flt, MPFR_RNDN);
-        char *temp2 = (char*) malloc(strlen(temp) + digits + 10);
-
-        long int_part = exp;
-        char *p = temp, *q = temp2;
-
-        if (*p == '-') {
-            *q = '-';
-            p++; q++;
-        }
-
-        size_t len = strlen(p);
-
-        if (int_part > 0 && len > int_part) {
-            char temp_ch = p[int_part];
-            p[int_part] = '\0';
-            strcpy(q, p);
-            strcat(q, ".");
-            p[int_part] = temp_ch;
-            strcat(q, p + int_part);
-        }
-        else if (int_part == 0 && len > 0) {
-            strcpy(q, "0.");
-            strcat(q, p);
-        } else if (int_part > 0 && len <= int_part) {
-            strcpy(q, p);
-            long zeros_n = int_part - len;
-            for (long i = 0; i < zeros_n; i++) {
-                strcat(q, "0");
-            }
-        }
-        else if (int_part < 0) {
-            strcpy(q, "0.");
-            for (long i = 0; i > int_part; --i) {
-                strcat(q, "0");
-            }
-            strcat(q, p);
-        }
-        else {
-            strcpy(temp2, "error");
-        }
+        char *temp = (char*) malloc(1000000);
+        mpfr_sprintf(temp, "%Rf", result->result.v_flt);
+        char *temp2 = (char*) malloc(strlen(temp) + 1);
+        strcpy(temp2, temp);
         free(temp);
         return temp2;
     }
