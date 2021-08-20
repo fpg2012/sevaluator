@@ -36,7 +36,7 @@ void sevaluator_history_destory(HistoryList *list) {
 }
 
 FullResult *sevaluator_history_get(HistoryList *list, int k) {
-    if (k >= list->len) {
+    if (k >= list->len || k < 0) {
         return NULL;
     }
     HistortyNode *current_node = list->first_node;

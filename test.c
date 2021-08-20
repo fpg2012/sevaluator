@@ -25,6 +25,7 @@ void test_result() {
 int main() {
     HistoryList *hist_list = sevaluator_history_create();
 
+    test("ans", hist_list);
     test("10 + 3", hist_list);
     test("10 * 3", hist_list);
     test("10 - 3", hist_list);

@@ -274,6 +274,7 @@ literal:
         if (mode == NO_HISTORY) { error_type = E_NO_HISTORY; YYABORT; }
         FullResult *hist_result = sevaluator_history_get(history_list, history_list->len-1);
         if (!hist_result) {
+            error_type = E_NO_HISTORY;
             YYABORT;
         }
         SE_COPY($$, *hist_result);
