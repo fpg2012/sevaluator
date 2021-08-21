@@ -302,6 +302,7 @@ void sevaluator_result_pow(FullResult *result, FullResult *op1, FullResult *op2)
             sevaluator_result_root_n(result, op1, root);
             mpfr_pow_z(result->result.v_flt, result->result.v_flt, mpq_numref(op2->result.v_rat), MPFR_RNDN);
         } else {
+            sevaluator_result_upgrade(op2, R_FLT);
             sevaluator_result_init(result, R_FLT);
             mpfr_pow(result->result.v_flt, op1->result.v_flt, op2->result.v_flt, MPFR_RNDN);
         }
