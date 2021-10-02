@@ -83,6 +83,10 @@ void sevaluator_result_fact(FullResult *result, unsigned long n);
 
 void sevaluator_result_pow(FullResult *result, FullResult *op1, FullResult *op2);
 
+void sevaluator_result_ceil(FullResult *result, FullResult *op1);
+void sevaluator_result_floor(FullResult *result, FullResult *op1);
+void sevaluator_result_round(FullResult *result, FullResult *op1);
+
 int sevaluator_result_check_zero(FullResult *result);
 int sevaluator_result_cmp_si(FullResult *result, long si);
 int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui);

@@ -92,6 +92,13 @@ int main() {
     test("(1923 % 123 + 1 * 10)!", hist_list);
     test("-3!", hist_list);
 
+    // test round
+    test("round[5.5]", hist_list);
+    test("round[4.5]", hist_list);
+    test("round[4.3]", hist_list);
+    test("ceil[4.5]", hist_list);
+    test("floor[4.5]", hist_list);
+
     // should be error
     test("10 / 0", hist_list);
     test("-√(2-16)", hist_list);

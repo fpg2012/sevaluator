@@ -392,6 +392,39 @@ void sevaluator_result_fact(FullResult *result, unsigned long n) {
     mpz_fac_ui(result->result.v_int, n);
 }
 
+void sevaluator_result_floor(FullResult *result, FullResult *op1) {
+    if (op1->result_type == R_INT) {
+        sevaluator_result_copy(result, op1);
+        return;
+    }
+    sevaluator_result_init(result, R_INT);
+    sevaluator_result_upgrade(op1, R_FLT);
+    mpfr_floor(op1->result.v_flt, op1->result.v_flt);
+    mpfr_get_z(result->result.v_int, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_ceil(FullResult *result, FullResult *op1) {
+    if (op1->result_type == R_INT) {
+        sevaluator_result_copy(result, op1);
+        return;
+    }
+    sevaluator_result_init(result, R_INT);
+    sevaluator_result_upgrade(op1, R_FLT);
+    mpfr_ceil(op1->result.v_flt, op1->result.v_flt);
+    mpfr_get_z(result->result.v_int, op1->result.v_flt, MPFR_RNDN);
+}
+
+void sevaluator_result_round(FullResult *result, FullResult *op1) {
+    if (op1->result_type == R_INT) {
+        sevaluator_result_copy(result, op1);
+        return;
+    }
+    sevaluator_result_init(result, R_INT);
+    sevaluator_result_upgrade(op1, R_FLT);
+    mpfr_roundeven(op1->result.v_flt, op1->result.v_flt);
+    mpfr_get_z(result->result.v_int, op1->result.v_flt, MPFR_RNDN);
+}
+
 int sevaluator_result_check_zero(FullResult *result) {
     if (result->result_type == R_INT) {
         return mpz_cmp_ui(result->result.v_int, 0);

@@ -46,6 +46,9 @@ static ErrorType error_type;
 #define SE_POW(a, b, c) sevaluator_result_pow(&(a), &(b), &(c))
 #define SE_ROOT_N(a, b, c) sevaluator_result_root_n(&(a), &(b), c)
 #define SE_FACT(a, b) sevaluator_result_fact(&(a), b)
+#define SE_FLOOR(a, b) sevaluator_result_floor(&(a), &(b));
+#define SE_CEIL(a, b) sevaluator_result_ceil(&(a), &(b));
+#define SE_ROUND(a, b) sevaluator_result_round(&(a), &(b));
 
 #define SE_CMP_SI(a, b) sevaluator_result_cmp_si(&(a), (b))
 #define SE_CMP_UI(a, b) sevaluator_result_cmp_ui(&(a), (b))
@@ -71,6 +74,7 @@ static ErrorType error_type;
 %token FUNC_SIN FUNC_COS FUNC_TAN FUNC_COT FUNC_CSC FUNC_SEC
 %token FUNC_ASIN FUNC_ACOS FUNC_ATAN
 %token FUNC_ABS FUNC_FLT
+%token FUNC_ROUND FUNC_FLOOR FUNC_CEIL
 %token CONST_PI CONST_E
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MOD
@@ -184,6 +188,7 @@ root:
         }
         unsigned long temp = mpz_get_ui($1.result.v_int);
         SE_FACT($$, temp);
+        SE_DESTROY($1);
     }
     | number { SE_COPY($$, $1); SE_DESTROY($1); }
     ;
@@ -191,6 +196,18 @@ number:
     LEFT expr RIGHT { SE_COPY($$, $2); SE_DESTROY($2); }
     | FUNC_EXP F_LEFT expr F_RIGHT {
         SE_EXP($$, $3);
+        SE_DESTROY($3);
+    }
+    | FUNC_ROUND F_LEFT expr F_RIGHT {
+        SE_ROUND($$, $3);
+        SE_DESTROY($3);
+    }
+    | FUNC_FLOOR F_LEFT expr F_RIGHT {
+        SE_FLOOR($$, $3);
+        SE_DESTROY($3);
+    }
+    | FUNC_CEIL F_LEFT expr F_RIGHT {
+        SE_CEIL($$, $3);
         SE_DESTROY($3);
     }
     | FUNC_LN F_LEFT expr F_RIGHT {
