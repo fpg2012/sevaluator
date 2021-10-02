@@ -464,18 +464,23 @@ int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui)
     return 0;
 }
 
-char *sevaluator_result_get_str(FullResult *result, size_t digits) {
+char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt) {
     char *temp;
-    if (result->result_type == R_INT) {
-        temp = mpz_get_str(NULL, 10, result->result.v_int);
+    FullResult temp_result;
+    sevaluator_result_copy(&temp_result, result);
+    if (sci_flt) {
+        sevaluator_result_upgrade(&temp_result, R_FLT);
+    }
+    if (temp_result.result_type == R_INT) {
+        temp = mpz_get_str(NULL, 10, temp_result.result.v_int);
         return temp;
     } else if (result->result_type == R_RAT) {
-        temp = mpq_get_str(NULL, 10, result->result.v_rat);
-        
+        temp = mpq_get_str(NULL, 10, temp_result.result.v_rat);
+
         int flag = 0;
         mpz_t a;
         mpz_init(a);
-        mpq_get_den(a, result->result.v_rat);
+        mpq_get_den(a, temp_result.result.v_rat);
         char *temp_a = mpz_get_str(NULL, 10, a);
         char *p = temp_a;
         if (*p == '1') {
@@ -492,10 +497,10 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits) {
         free(temp_a);
         if (flag || strlen(temp) > 20)
         {
-            sevaluator_result_upgrade(result, R_FLT);
+            sevaluator_result_upgrade(&temp_result, R_FLT);
             free(temp);
             temp = (char *)malloc(1000000);
-            mpfr_sprintf(temp, "%Rf", result->result.v_flt);
+            mpfr_sprintf(temp, "%Rf", temp_result.result.v_flt);
             char *temp2 = (char *)malloc(strlen(temp) + 1);
             strcpy(temp2, temp);
             free(temp);
@@ -505,7 +510,14 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits) {
         return temp;
     } else {
         char *temp = (char*) malloc(1000000);
-        mpfr_sprintf(temp, "%Rf", result->result.v_flt);
+        char fmt[100];
+        if (sci_flt) {
+            sprintf(fmt, "%%.%dRe", digits);
+            mpfr_sprintf(temp, fmt, temp_result.result.v_flt);
+        } else {
+            sprintf(fmt, "%%.%dRf", digits);
+            mpfr_sprintf(temp, "%Rf", temp_result.result.v_flt);
+        }
         char *temp2 = (char*) malloc(strlen(temp) + 1);
         strcpy(temp2, temp);
         free(temp);

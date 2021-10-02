@@ -1,6 +1,7 @@
 #ifndef SEVALUATOR 
 #define SEVALUATOR
 #include <gmp.h>
+#include <stdbool.h>
 #include "sevaluator_history.h"
 #include "sevaluator_result.h"
 
@@ -23,7 +24,7 @@ typedef enum error_type {
     E_INVALID_PARAMETER
 } ErrorType;
 
-ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits);
+ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits, bool sci_flt);
 
 #ifdef __cplusplus
 }

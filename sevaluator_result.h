@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mpfr.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,7 +92,7 @@ int sevaluator_result_check_zero(FullResult *result);
 int sevaluator_result_cmp_si(FullResult *result, long si);
 int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui);
 
-char *sevaluator_result_get_str(FullResult *result, size_t digits);
+char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt);
 
 #ifdef __cplusplus
 }

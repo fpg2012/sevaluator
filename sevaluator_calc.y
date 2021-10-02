@@ -365,7 +365,7 @@ void init_random_state() {
     gmp_randseed_ui(random_state, seed);
 }
 
-ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits) {
+ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits, bool sci_flt) {
     init_random_state();
     error_type = E_OK;
     if (!list) {
@@ -379,7 +379,7 @@ ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, s
     if (error) {
         *output = NULL;
     } else {
-        *output = sevaluator_result_get_str(&final_result, float_digits);
+        *output = sevaluator_result_get_str(&final_result, float_digits, sci_flt);
         if (mode != NO_HISTORY) {
             sevaluator_history_push(history_list, input, &final_result);
             sevaluator_result_destroy(&final_result);

@@ -4,7 +4,7 @@
 
 int test(const char *expr, HistoryList *list) {
     char *output;
-    int error = sevaluator_calc(expr, &output, list, 5);
+    int error = sevaluator_calc(expr, &output, list, 5, false);
     if (error) {
         printf("\"%s\" => error\n", expr);
         return 1;
@@ -18,7 +18,7 @@ void test_result() {
     sevaluator_result_init_str(&a, R_FLT, "-0.1");
     sevaluator_result_init_str(&b, R_FLT, "0.2");
     sevaluator_result_mul(&c, &a, &b);
-    char *temp = sevaluator_result_get_str(&c, 10);
+    char *temp = sevaluator_result_get_str(&c, 10, false);
     printf("%s\n", temp);
 }
 
