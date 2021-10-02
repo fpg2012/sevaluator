@@ -3,6 +3,7 @@
 %{
 #include <stdio.h>
 #include <gmp.h>
+#include <mpfr.h>
 #include <string.h>
 #include <stdbool.h>
 #define YY_DECL int yylex()
@@ -15,6 +16,11 @@ void from_decimal(mpq_t, const char *);
 %%
 
 [ \t\n\r] ;
+[0-9]+(\.[0-9]+)*(e|E)(\+|-)?[0-9]+ {
+    mpfr_init(yylval.v_float);
+    mpfr_set_str(yylval.v_float, yytext, 10, MPFR_RNDN);
+    return FLOAT; 
+    }
 [0-9]+\.[0-9]+ { 
     from_decimal(yylval.v_rational, yytext); 
     return RATIONAL; 

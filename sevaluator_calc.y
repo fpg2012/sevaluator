@@ -343,6 +343,7 @@ literal:
         sevaluator_result_init(&$$, R_FLT);
         mpfr_urandom($$.result.v_flt, random_state, MPFR_RNDN);
     }
+    | FLOAT { sevaluator_result_init(&$$, R_FLT); mpfr_set($$.result.v_flt, $1, MPFR_RNDN); mpfr_clear($1); }
     | RATIONAL { sevaluator_result_init(&$$, R_RAT); mpq_set($$.result.v_rat, $1); mpq_clear($1); }
     | INTEGER { sevaluator_result_init(&$$, R_INT); mpz_set($$.result.v_int, $1); mpz_clear($1); }
     | CONST_PI { sevaluator_result_init(&$$, R_FLT); mpfr_const_pi($$.result.v_flt, MPFR_RNDN); }

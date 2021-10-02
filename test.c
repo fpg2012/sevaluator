@@ -31,6 +31,10 @@ int main() {
     test("10 * 3", hist_list);
     test("10 - 3", hist_list);
     test("10 / 3", hist_list);
+    
+    test("1.0e-3", hist_list);
+    test("1E+3", hist_list);
+    test("0.2e3", hist_list);
 
     test("-√2", hist_list);
     test("--√√4", hist_list);
@@ -91,6 +95,7 @@ int main() {
     // test fact
     test("(1923 % 123 + 1 * 10)!", hist_list);
     test("-3!", hist_list);
+    // test("321323!", hist_list);
 
     // test round
     test("round[5.5]", hist_list);
