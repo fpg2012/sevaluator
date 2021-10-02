@@ -39,6 +39,7 @@ void from_decimal(mpq_t, const char *);
 "," { return COMMA; }
 "hist" { return FUNC_HIST; }
 "random" { return FUNC_RANDOM; }
+"rand" { return FUNC_RANDOM; }
 "ans" { return ANS; }
 "exp" { return FUNC_EXP; }
 "log2" { return FUNC_LOG2; }
