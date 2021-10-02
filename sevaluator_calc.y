@@ -4,7 +4,9 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <string.h>
-#include <sys/random.h>
+#include <time.h>
+#include <limits.h>
+// #include <sys/random.h>
 #include "sevaluator.h"
 
 extern int yylex();
@@ -43,8 +45,10 @@ static ErrorType error_type;
 #define SE_ATAN(a, b) sevaluator_result_atan(&(a), &(b))
 #define SE_POW(a, b, c) sevaluator_result_pow(&(a), &(b), &(c))
 #define SE_ROOT_N(a, b, c) sevaluator_result_root_n(&(a), &(b), c)
+#define SE_FACT(a, b) sevaluator_result_fact(&(a), b)
 
 #define SE_CMP_SI(a, b) sevaluator_result_cmp_si(&(a), (b))
+#define SE_CMP_UI(a, b) sevaluator_result_cmp_ui(&(a), (b))
 #define SE_CHECK_ZERO(a) sevaluator_result_check_zero(&(a))
 
 %}
@@ -161,6 +165,25 @@ root:
         SE_POW($$, $1, $3);
         SE_DESTROY($1);
         SE_DESTROY($3);
+    }
+    | number FACTORIAL {
+        if ($1.result_type != R_INT) {
+            fprintf(stderr, "fact of non-int\n");
+            error_type = E_INVALID_PARAMETER;
+            YYABORT;
+        }
+        if (SE_CHECK_ZERO($1) < 0) {
+            fprintf(stderr, "fact of negative int\n");
+            error_type = E_INVALID_PARAMETER;
+            YYABORT;
+        }
+        if (SE_CMP_UI($1, ULONG_MAX) > 0) {
+            fprintf(stderr, "fact of large number\n");
+            error_type = E_INVALID_PARAMETER;
+            YYABORT;
+        }
+        unsigned long temp = mpz_get_ui($1.result.v_int);
+        SE_FACT($$, temp);
     }
     | number { SE_COPY($$, $1); SE_DESTROY($1); }
     ;
@@ -297,9 +320,11 @@ literal:
         mpz_clear($3);
     }
     | FUNC_RANDOM F_LEFT F_RIGHT {
-        unsigned long temp = gmp_urandomb_ui(random_state, 8);
-        sevaluator_result_init(&$$, R_INT);
-        mpz_set_ui($$.result.v_int, temp);
+        // unsigned long temp = gmp_urandomb_ui(random_state, 8);
+        // sevaluator_result_init(&$$, R_INT);
+        // mpz_set_ui($$.result.v_int, temp);
+        sevaluator_result_init(&$$, R_FLT);
+        mpfr_urandom($$.result.v_flt, random_state, MPFR_RNDN);
     }
     | RATIONAL { sevaluator_result_init(&$$, R_RAT); mpq_set($$.result.v_rat, $1); mpq_clear($1); }
     | INTEGER { sevaluator_result_init(&$$, R_INT); mpz_set($$.result.v_int, $1); mpz_clear($1); }
@@ -317,8 +342,8 @@ literal:
 
 void init_random_state() {
     gmp_randinit_default(random_state);
-    unsigned long seed;
-    getrandom(&seed, sizeof(seed), GRND_RANDOM);
+    unsigned long seed = time(NULL);
+    /* getrandom(&seed, sizeof(seed), GRND_RANDOM); */
     gmp_randseed_ui(random_state, seed);
 }
 

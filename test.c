@@ -84,6 +84,13 @@ int main() {
     // test flt[]
     test("1.1^1000", hist_list);
     test("flt[1.1^1000]", hist_list);
+    
+    // test random[]
+    test("random[]", hist_list);
+
+    // test fact
+    test("(1923 % 123 + 1 * 10)!", hist_list);
+    test("-3!", hist_list);
 
     // should be error
     test("10 / 0", hist_list);
@@ -96,6 +103,9 @@ int main() {
     test("root[-8, 2]", hist_list);
     test("root[8, 1.5]", hist_list);
     test("asin[-2]", hist_list);
+    test("100000000000000000000000000000000000000000000000!", hist_list);
+    test("1.1!", hist_list);
+    test("(-1)!", hist_list);
 
     sevaluator_history_destory(hist_list);
 

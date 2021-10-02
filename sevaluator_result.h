@@ -79,11 +79,13 @@ void sevaluator_result_csc(FullResult *result, FullResult *op1);
 void sevaluator_result_asin(FullResult *result, FullResult *op1);
 void sevaluator_result_atan(FullResult *result, FullResult *op1);
 void sevaluator_result_acos(FullResult *result, FullResult *op1);
+void sevaluator_result_fact(FullResult *result, unsigned long n);
 
 void sevaluator_result_pow(FullResult *result, FullResult *op1, FullResult *op2);
 
 int sevaluator_result_check_zero(FullResult *result);
 int sevaluator_result_cmp_si(FullResult *result, long si);
+int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui);
 
 char *sevaluator_result_get_str(FullResult *result, size_t digits);
 

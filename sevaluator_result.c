@@ -387,6 +387,11 @@ void sevaluator_result_acos(FullResult *result, FullResult *op1) {
     mpfr_acos(result->result.v_flt, op1->result.v_flt, MPFR_RNDN);
 }
 
+void sevaluator_result_fact(FullResult *result, unsigned long n) {
+    sevaluator_result_init(result, R_INT);
+    mpz_fac_ui(result->result.v_int, n);
+}
+
 int sevaluator_result_check_zero(FullResult *result) {
     if (result->result_type == R_INT) {
         return mpz_cmp_ui(result->result.v_int, 0);
@@ -405,6 +410,23 @@ int sevaluator_result_cmp_si(FullResult *result, long si) {
         return mpq_cmp_si(result->result.v_rat, si, 1);
     } else if (result->result_type == R_FLT) {
         return mpfr_cmp_si(result->result.v_flt, si);
+    }
+    return 0;
+}
+
+int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui)
+{
+    if (result->result_type == R_INT)
+    {
+        return mpz_cmp_ui(result->result.v_int, ui);
+    }
+    else if (result->result_type == R_RAT)
+    {
+        return mpq_cmp_ui(result->result.v_rat, ui, 1);
+    }
+    else if (result->result_type == R_FLT)
+    {
+        return mpfr_cmp_ui(result->result.v_flt, ui);
     }
     return 0;
 }
