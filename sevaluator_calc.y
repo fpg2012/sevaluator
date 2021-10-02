@@ -4,9 +4,9 @@
 #include <gmp.h>
 #include <mpfr.h>
 #include <string.h>
-#include <time.h>
+// #include <time.h>
 #include <limits.h>
-// #include <sys/random.h>
+#include <sys/random.h>
 #include "sevaluator.h"
 
 extern int yylex();
@@ -360,8 +360,8 @@ literal:
 
 void init_random_state() {
     gmp_randinit_default(random_state);
-    unsigned long seed = time(NULL);
-    /* getrandom(&seed, sizeof(seed), GRND_RANDOM); */
+    unsigned long seed;
+    getrandom(&seed, sizeof(seed), GRND_RANDOM);
     gmp_randseed_ui(random_state, seed);
 }
 
