@@ -28,6 +28,13 @@ typedef struct full_result {
     Result result;
 } FullResult;
 
+#define SE_M_CONST 10
+
+typedef struct {
+    const char *const_name;
+    const char *value;
+} Constant;
+
 // attention! this function does NOT call malloc for `result`
 void sevaluator_result_init(FullResult *result, ResultType type);
 
@@ -91,6 +98,8 @@ void sevaluator_result_round(FullResult *result, FullResult *op1);
 int sevaluator_result_check_zero(FullResult *result);
 int sevaluator_result_cmp_si(FullResult *result, long si);
 int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui);
+
+int sevaluator_result_from_const(FullResult *result, const char *const_str);
 
 char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt);
 

@@ -21,7 +21,8 @@ typedef enum error_type {
     E_NEGATIVE_ROOT,
     E_NO_HISTORY,
     E_TYPE,
-    E_INVALID_PARAMETER
+    E_INVALID_PARAMETER,
+    E_UNKNOWN_TOKEN
 } ErrorType;
 
 ErrorType sevaluator_calc(const char *input, char **output, HistoryList *list, size_t float_digits, bool sci_flt);

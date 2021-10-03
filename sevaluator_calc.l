@@ -6,6 +6,7 @@
 #include <mpfr.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #define YY_DECL int yylex()
 #include "sevaluator_result.h"
 #include "sevaluator_calc.tab.h"
@@ -70,6 +71,7 @@ void from_decimal(mpq_t, const char *);
 "π" { return CONST_PI; }
 "pi" { return CONST_PI; }
 "e" { return CONST_E; }
+[a-zA-Z_][a-zA-Z0-9_]* { yylval.v_str = malloc(strlen(yytext) + 10); strcpy(yylval.v_str, yytext); return TOKEN; }
 
 %%
 

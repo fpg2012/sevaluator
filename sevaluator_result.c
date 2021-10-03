@@ -2,6 +2,19 @@
 #include <limits.h>
 #include <string.h>
 
+Constant se_const_values[SE_M_CONST]= {
+    {"c", "299792458"},
+    {"q_e", "1.602176565e-19"},
+    {"N_A", "6.02214129e23"},
+    {"R", "8.3144621"},
+    {"epsilon_0", "8.854187817e-12"},
+    {"g", "9.80665"},
+    {"G", "6.67384e-11"},
+    {"h", "6.62606957e-34"},
+    {"h_bar", "1.054571726e-34"},
+    {"T_0", "273.15"}
+};
+
 /*
     Z Q R (op1)
   Z Z Q R
@@ -464,6 +477,24 @@ int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui)
     return 0;
 }
 
+int sevaluator_result_from_const(FullResult *result, const char *const_str) {
+    // look up in the const_value list
+    // TODO: speed up with a hashmap or cache
+    int found = -1;
+    for (int i = 0; i < SE_M_CONST; i++) {
+        if (strcmp(const_str, se_const_values[i].const_name) == 0) {
+            found = i;
+            break;
+        }
+    }
+    if (found == -1 || found >= SE_M_CONST) {
+        return 0;
+    }
+    sevaluator_result_init(result, R_FLT);
+    mpfr_set_str(result->result.v_flt, se_const_values[found].value, 10, MPFR_RNDN);
+    return 1;
+}
+
 char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt) {
     char *temp;
     FullResult temp_result;
@@ -499,9 +530,9 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt)
         {
             sevaluator_result_upgrade(&temp_result, R_FLT);
             free(temp);
-            temp = (char *)malloc(1000000);
+            temp = (char *) malloc(1000000);
             mpfr_sprintf(temp, "%Rf", temp_result.result.v_flt);
-            char *temp2 = (char *)malloc(strlen(temp) + 1);
+            char *temp2 = (char *) malloc(strlen(temp) + 1);
             strcpy(temp2, temp);
             free(temp);
             temp = temp2;
@@ -512,11 +543,19 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt)
         char *temp = (char*) malloc(1000000);
         char fmt[100];
         if (sci_flt) {
-            sprintf(fmt, "%%.%dRe", digits);
+            if (digits == 0) {
+                sprintf(fmt, "%%Re");
+            } else {
+                sprintf(fmt, "%%.%dRe", digits);
+            }
             mpfr_sprintf(temp, fmt, temp_result.result.v_flt);
         } else {
-            sprintf(fmt, "%%.%dRf", digits);
-            mpfr_sprintf(temp, "%Rf", temp_result.result.v_flt);
+            if (digits == 0) {
+                sprintf(fmt, "%%Rf");
+            } else {
+                sprintf(fmt, "%%.%dRf", digits);
+            }
+            mpfr_sprintf(temp, fmt, temp_result.result.v_flt);
         }
         char *temp2 = (char*) malloc(strlen(temp) + 1);
         strcpy(temp2, temp);
