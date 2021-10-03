@@ -2,7 +2,7 @@
 #include <limits.h>
 #include <string.h>
 
-Constant se_const_values[SE_M_CONST]= {
+static const Constant se_const_values[SE_M_CONST]= {
     {"c", "299792458"},
     {"q_e", "1.602176565e-19"},
     {"N_A", "6.02214129e23"},
@@ -493,6 +493,10 @@ int sevaluator_result_from_const(FullResult *result, const char *const_str) {
     sevaluator_result_init(result, R_FLT);
     mpfr_set_str(result->result.v_flt, se_const_values[found].value, 10, MPFR_RNDN);
     return 1;
+}
+
+const Constant *sevaluator_result_get_const_table() {
+    return se_const_values;
 }
 
 char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt) {

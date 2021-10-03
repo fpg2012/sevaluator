@@ -101,6 +101,8 @@ int sevaluator_result_cmp_ui(FullResult *result, unsigned long ui);
 
 int sevaluator_result_from_const(FullResult *result, const char *const_str);
 
+const Constant* sevaluator_result_get_const_table();
+
 char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt);
 
 #ifdef __cplusplus
