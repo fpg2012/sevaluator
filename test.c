@@ -4,7 +4,7 @@
 
 int test(const char *expr, HistoryList *list) {
     char *output;
-    int error = sevaluator_calc(expr, &output, list, 5, false);
+    int error = sevaluator_calc(expr, &output, list, 5, true);
     if (error) {
         printf("\"%s\" => error\n", expr);
         return 1;
@@ -118,6 +118,14 @@ int main() {
     test("100000000000000000000000000000000000000000000000!", hist_list);
     test("1.1!", hist_list);
     test("(-1)!", hist_list);
+
+    // token test
+    test("g", hist_list);
+    test("G", hist_list);
+    test("epsilon_0", hist_list);
+    test("c", hist_list);
+    test("C", hist_list);
+    test("N_A", hist_list);
 
     sevaluator_history_destory(hist_list);
 

@@ -61,11 +61,13 @@ static ErrorType error_type;
     mpq_t v_rational;
     mpz_t v_integer;
     mpfr_t v_float;
+    char * v_str;
 }
 
 %token<v_integer> INTEGER;
 %token<v_rational> RATIONAL;
 %token<v_float> FLOAT;
+%token<v_str> TOKEN;
 %token PLUS MINUS MULTIPLY DIVIDE MOD SQRT POWER
 %token LEFT RIGHT F_LEFT F_RIGHT COMMA
 %token FUNC_HIST FUNC_RANDOM FACTORIAL ANS
@@ -76,6 +78,7 @@ static ErrorType error_type;
 %token FUNC_ABS FUNC_FLT
 %token FUNC_ROUND FUNC_FLOOR FUNC_CEIL
 %token CONST_PI CONST_E
+
 %left PLUS MINUS
 %left MULTIPLY DIVIDE MOD
 
@@ -353,6 +356,16 @@ literal:
         sevaluator_result_init_str(&fr, R_FLT, "1");
         SE_EXP($$, fr);
         SE_DESTROY(fr);
+    }
+    | TOKEN {
+        int ret = sevaluator_result_from_const(&$$, $1);
+        if (ret == 0) {
+            error_type = E_UNKNOWN_TOKEN;
+            fprintf(stderr, "unknown token\n");
+            free($1);
+            YYABORT;
+        }
+        free($1);
     }
     ;
 
