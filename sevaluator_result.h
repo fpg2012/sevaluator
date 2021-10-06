@@ -28,7 +28,7 @@ typedef struct full_result {
     Result result;
 } FullResult;
 
-#define SE_M_CONST 10
+#define SE_M_CONST 15
 
 typedef struct {
     const char *const_name;
