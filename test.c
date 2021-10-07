@@ -4,7 +4,7 @@
 
 int test(const char *expr, HistoryList *list) {
     char *output;
-    int error = sevaluator_calc(expr, &output, list, 5, true);
+    int error = sevaluator_calc(expr, &output, list, 5, false);
     if (error) {
         printf("\"%s\" => error\n", expr);
         return 1;
