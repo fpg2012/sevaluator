@@ -514,7 +514,7 @@ char *sevaluator_result_get_str(FullResult *result, size_t digits, bool sci_flt)
     if (temp_result.result_type == R_INT) {
         temp = mpz_get_str(NULL, 10, temp_result.result.v_int);
         return temp;
-    } else if (result->result_type == R_RAT) {
+    } else if (temp_result.result_type == R_RAT) {
         temp = mpq_get_str(NULL, 10, temp_result.result.v_rat);
 
         int flag = 0;

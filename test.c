@@ -4,7 +4,7 @@
 
 int test(const char *expr, HistoryList *list) {
     char *output;
-    int error = sevaluator_calc(expr, &output, list, 5, false);
+    int error = sevaluator_calc(expr, &output, list, 5, true);
     if (error) {
         printf("\"%s\" => error\n", expr);
         return 1;
@@ -31,6 +31,7 @@ int main() {
     test("10 * 3", hist_list);
     test("10 - 3", hist_list);
     test("10 / 3", hist_list);
+    test("12/33", hist_list);
     
     test("1.0e-3", hist_list);
     test("1E+3", hist_list);
