@@ -1,7 +1,5 @@
 # Sevaluator
 
-> Still under development
-
 A simple expression evaluator, generated with flex & bison. Sevaluator invokes GMP library to support large number.
 
 usage example (see test.c):
